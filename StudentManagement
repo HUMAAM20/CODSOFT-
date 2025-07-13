@@ -1,0 +1,173 @@
+package Codsoft;
+
+import java.io.*;
+import java.util.*;
+
+// 1. Student class
+class Student implements Serializable {
+    private String name;
+    private int rollNumber;
+    private String grade;
+
+    public Student(String name, int rollNumber, String grade) {
+        this.name = name;
+        this.rollNumber = rollNumber;
+        this.grade = grade;
+    }
+
+    // Getters and Setters
+    public String getName() { return name; }
+    public int getRollNumber() { return rollNumber; }
+    public String getGrade() { return grade; }
+
+    public void setName(String name) { this.name = name; }
+    public void setGrade(String grade) { this.grade = grade; }
+
+    @Override
+    public String toString() {
+        return "Roll No: " + rollNumber + ", Name: " + name + ", Grade: " + grade;
+    }
+}
+
+// 2. Management system class
+class StudentManagementSystem {
+    private List<Student> students = new ArrayList<>();
+    private final String FILE_NAME = "students.dat";
+
+    public StudentManagementSystem() {
+        loadFromFile();
+    }
+
+    public void addStudent(Student student) {
+        students.add(student);
+        saveToFile();
+        System.out.println("✅ Student added successfully.");
+    }
+
+    public void removeStudent(int rollNumber) {
+        boolean found = students.removeIf(s -> s.getRollNumber() == rollNumber);
+        if (found) {
+            saveToFile();
+            System.out.println("✅ Student removed.");
+        } else {
+            System.out.println("❌ Student not found.");
+        }
+    }
+
+    public void editStudent(int rollNumber, Scanner scanner) {
+        for (Student student : students) {
+            if (student.getRollNumber() == rollNumber) {
+                System.out.print("Enter new name: ");
+                String name = scanner.next();
+                System.out.print("Enter new grade: ");
+                String grade = scanner.next();
+                student.setName(name);
+                student.setGrade(grade);
+                saveToFile();
+                System.out.println("✅ Student updated.");
+                return;
+            }
+        }
+        System.out.println("❌ Student not found.");
+    }
+
+    public void searchStudent(int rollNumber) {
+        for (Student student : students) {
+            if (student.getRollNumber() == rollNumber) {
+                System.out.println("🔍 " + student);
+                return;
+            }
+        }
+        System.out.println("❌ Student not found.");
+    }
+
+    public void displayAll() {
+        if (students.isEmpty()) {
+            System.out.println("ℹ️ No students found.");
+        } else {
+            System.out.println("📋 Student List:");
+            for (Student s : students) {
+                System.out.println(s);
+            }
+        }
+    }
+
+    private void saveToFile() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            out.writeObject(students);
+        } catch (IOException e) {
+            System.out.println("❌ Error saving to file: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadFromFile() {
+        File file = new File(FILE_NAME);
+        if (!file.exists()) return;
+
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            students = (List<Student>) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("❌ Error loading file: " + e.getMessage());
+        }
+    }
+}
+public class StudentManagement {
+	 public static void main(String[] args) {
+	        StudentManagementSystem sms = new StudentManagementSystem();
+	        Scanner scanner = new Scanner(System.in);
+
+	        while (true) {
+	            System.out.println("\n===== Student Management System =====");
+	            System.out.println("1. Add Student");
+	            System.out.println("2. Edit Student");
+	            System.out.println("3. Remove Student");
+	            System.out.println("4. Search Student");
+	            System.out.println("5. Display All Students");
+	            System.out.println("6. Exit");
+	            System.out.print("Choose an option: ");
+	            
+	            int choice = scanner.nextInt();
+
+	            switch (choice) {
+	                case 1 -> {
+	                    System.out.print("Enter name: ");
+	                    String name = scanner.next();
+	                    System.out.print("Enter roll number: ");
+	                    int roll = scanner.nextInt();
+	                    System.out.print("Enter grade: ");
+	                    String grade = scanner.next();
+
+	                    if (name.isEmpty() || grade.isEmpty()) {
+	                        System.out.println("❌ Name and grade cannot be empty.");
+	                    } else {
+	                        Student s = new Student(name, roll, grade);
+	                        sms.addStudent(s);
+	                    }
+	                }
+	                case 2 -> {
+	                    System.out.print("Enter roll number to edit: ");
+	                    int roll = scanner.nextInt();
+	                    sms.editStudent(roll, scanner);
+	                }
+	                case 3 -> {
+	                    System.out.print("Enter roll number to remove: ");
+	                    int roll = scanner.nextInt();
+	                    sms.removeStudent(roll);
+	                }
+	                case 4 -> {
+	                    System.out.print("Enter roll number to search: ");
+	                    int roll = scanner.nextInt();
+	                    sms.searchStudent(roll);
+	                }
+	                case 5 -> sms.displayAll();
+	                case 6 -> {
+	                    System.out.println("👋 Exiting... Goodbye!");
+	                    scanner.close();
+	                    return;
+	                }
+	                default -> System.out.println("❌ Invalid option.");
+	            }
+	        }
+	    }
+}

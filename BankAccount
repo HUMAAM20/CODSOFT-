@@ -1,0 +1,100 @@
+package Codsoft;
+
+import java.util.Scanner;
+
+//1. BankAccount class
+class BankAccount {
+ private double balance;
+
+ public BankAccount(double initialBalance) {
+     this.balance = initialBalance;
+ }
+
+ public boolean withdraw(double amount) {
+     if (amount > 0 && amount <= balance) {
+         balance -= amount;
+         return true;
+     } else {
+         return false;
+     }
+ }
+
+ public boolean deposit(double amount) {
+     if (amount > 0) {
+         balance += amount;
+         return true;
+     } else {
+         return false;
+     }
+ }
+
+ public double getBalance() {
+     return balance;
+ }
+}
+
+//2. ATM class
+class ATM {
+ private BankAccount account;
+ private Scanner scanner;
+
+ public ATM(BankAccount account) {
+     this.account = account;
+     this.scanner = new Scanner(System.in);
+ }
+
+ // 3. ATM menu
+ public void showMenu() {
+     int choice;
+     do {
+         System.out.println("\n===== ATM MENU =====");
+         System.out.println("1. Withdraw");
+         System.out.println("2. Deposit");
+         System.out.println("3. Check Balance");
+         System.out.println("4. Exit");
+         System.out.print("Choose an option: ");
+         choice = scanner.nextInt();
+
+         switch (choice) {
+             case 1 -> handleWithdraw();
+             case 2 -> handleDeposit();
+             case 3 -> checkBalance();
+             case 4 -> System.out.println("🔒 Thank you for using the ATM. Goodbye!");
+             default -> System.out.println("❌ Invalid option. Please try again.");
+         }
+     } while (choice != 4);
+ }
+
+ private void handleWithdraw() {
+     System.out.print("Enter amount to withdraw: ₹");
+     double amount = scanner.nextDouble();
+     if (amount <= 0) {
+         System.out.println("❌ Invalid amount. Must be greater than 0.");
+     } else if (account.withdraw(amount)) {
+         System.out.println("✅ Withdrawal successful! New Balance: ₹" + account.getBalance());
+     } else {
+         System.out.println("❌ Insufficient balance.");
+     }
+ }
+
+ private void handleDeposit() {
+     System.out.print("Enter amount to deposit: ₹");
+     double amount = scanner.nextDouble();
+     if (account.deposit(amount)) {
+         System.out.println("✅ Deposit successful! New Balance: ₹" + account.getBalance());
+     } else {
+         System.out.println("❌ Invalid amount. Must be greater than 0.");
+     }
+ }
+
+ private void checkBalance() {
+     System.out.println("💰 Your current balance is: ₹" + account.getBalance());
+ }
+}
+public class ATMSystem {
+	public static void main(String[] args) {
+        BankAccount userAccount = new BankAccount(1000.0);  // Initial balance ₹1000
+        ATM atm = new ATM(userAccount);
+        atm.showMenu();
+    }
+}
